@@ -5,27 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wine Quality Prediction</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; }
-        input[type="number"] { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        button { background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background-color: #45a049; }
-        .prediction { margin-top: 20px; }
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; color: #333; }
+        .container { max-width: 600px; margin: auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #6D214F; text-align: center; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 10px; color: #333; }
+        input[type="number"] { width: 60%; padding: 10px; margin-top: 5px; border: 2px solid #6D214F; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #6D214F; color: white; padding: 15px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 18px; }
+        button:hover { background-color: #562E37; }
+        .prediction { margin-top: 20px; text-align: center; font-size: 18px; color: #333; }
     </style>
 </head>
 <body>
-    <h1>Wine Quality Prediction</h1>
-    <form id="predictionForm">
-        {% for feature, range in FEATURE_RANGES.items() %}
-        <div class="form-group">
-            <label for="{{ feature }}">{{ feature.replace('_', ' ') | capitalize }} (Range: {{ range[0] }} - {{ range[1] }})</label>
-            <input type="number" id="{{ feature }}" name="{{ feature }}" step="any" required min="{{ range[0] }}" max="{{ range[1] }}">
-        </div>
-        {% endfor %}
-        <button type="submit">Predict</button>
-    </form>
-    <div class="prediction" id="predictionResult"></div>
+    <div class="container">
+        <h1>Wine Quality Prediction</h1>
+        <form id="predictionForm">
+            {% for feature, range in FEATURE_RANGES.items() %}
+            <div class="form-group">
+                <label for="{{ feature }}">{{ feature.replace('_', ' ') | capitalize }} (Range: {{ range[0] }} - {{ range[1] }})</label>
+                <input type="number" id="{{ feature }}" name="{{ feature }}" step="any" required min="{{ range[0] }}" max="{{ range[1] }}">
+            </div>
+            {% endfor %}
+            <div style="text-align: center;">
+                <button type="submit">Predict</button>
+            </div>
+        </form>
+        <div class="prediction" id="predictionResult"></div>
+    </div>
 
     <script>
         document.getElementById('predictionForm').addEventListener('submit', function(e) {
