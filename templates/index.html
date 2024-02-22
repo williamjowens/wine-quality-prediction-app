@@ -12,6 +12,9 @@
         {% for feature, range in FEATURE_RANGES.items() %}
         <div class="form-group">
             <label for="{{ feature }}">{{ feature.replace('_', ' ').title() }} ({{ range[0] }} - {{ range[1] }}):</label>
+            <div class="wine-glass">
+                <div class="wine-fill" style="height: 0%;"></div>
+            </div>
             <input type="number" id="{{ feature }}" name="{{ feature }}" min="{{ range[0] }}" max="{{ range[1] }}" step="0.01" required>
         </div>
         {% endfor %}
