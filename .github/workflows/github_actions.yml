@@ -22,7 +22,7 @@ jobs:
         run: pip install --no-cache-dir -r requirements.txt
 
       - name: Build Docker Image
-        run: docker build -t myapp:$GITHUB_SHA .
+        run: docker build -t wine-quality-predictor:$GITHUB_SHA .
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
@@ -32,8 +32,8 @@ jobs:
 
       - name: Push Docker Image to Docker Hub
         run: |
-          docker tag myapp:$GITHUB_SHA ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:$GITHUB_SHA
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:$GITHUB_SHA
+          docker tag wine-quality-predictor:$GITHUB_SHA ${{ secrets.DOCKER_HUB_USERNAME }}/wine-quality-predictor:$GITHUB_SHA
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/wine-quality-predictor:$GITHUB_SHA
 
       - name: Log in to Heroku Container Registry
         uses: akhileshns/heroku-deploy@v3.12.12
@@ -47,3 +47,6 @@ jobs:
         run: heroku container:release web --app wine-quality-predictor
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+  
+      - name: Print URL of deployed app
+        run: echo "App is deployed at https://wine-quality-predictor.herokuapp.com"
