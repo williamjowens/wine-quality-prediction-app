@@ -33,7 +33,7 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        data = request.get_json()  # Parse JSON data sent from the client
+        data = request.get_json()
         feature_values = [data[feature] for feature in FEATURE_RANGES]
         
         # Ensure all features are present
