@@ -23,12 +23,5 @@ EXPOSE 5000
 RUN useradd -m appuser
 USER appuser
 
-# Define environment variable for dynamic port binding
-ENV PORT=5000
-
-# Check the application health
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-  CMD curl --fail http://localhost:$PORT/ || exit 1
-
 # Command to run the application
 CMD gunicorn --workers=3 --bind 0.0.0.0:$PORT app:app

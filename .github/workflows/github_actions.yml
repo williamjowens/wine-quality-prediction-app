@@ -49,4 +49,4 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
   
       - name: Print URL of deployed app
-        run: echo "App is deployed at https://wine-quality-predictor.herokuapp.com"
+        run: "App is deployed at https://wine-quality-predictor.herokuapp.com"
