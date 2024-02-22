@@ -2,6 +2,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('wineForm');
     const resultDiv = document.getElementById('predictionResult');
 
+    // Update value display and wine glass fill for each slider input
+    document.querySelectorAll('input[type="range"]').forEach(input => {
+        input.addEventListener('input', function() {
+            updateValueDisplay(this.id, this.value);
+            updateWineGlass();
+        });
+    });
+
     form.onsubmit = async function(e) {
         e.preventDefault();
 
@@ -9,43 +17,34 @@ document.addEventListener('DOMContentLoaded', function() {
         resultDiv.innerHTML = '';
         resultDiv.style.display = 'none';
 
-        const formData = new FormData(form);
         const data = {};
         let isValid = true;
 
-        // Validate and collect form data
-        formData.forEach((value, key) => {
-            // Convert input value to float and validate
-            const numValue = parseFloat(value);
-            const inputElement = document.getElementById(key);
-            const min = parseFloat(inputElement.min);
-            const max = parseFloat(inputElement.max);
-            const glass = inputElement.nextElementSibling.querySelector('.wine-fill');
+        // Validate and collect form data from sliders
+        document.querySelectorAll('input[type="range"]').forEach(input => {
+            const numValue = parseFloat(input.value);
+            const min = parseFloat(input.min);
+            const max = parseFloat(input.max);
 
             if (isNaN(numValue) || numValue < min || numValue > max) {
                 isValid = false;
-                inputElement.classList.add('invalid-input'); // Highlight invalid input
-                resultDiv.innerHTML += `Value for ${key.replace('_', ' ')} must be between ${min} and ${max}.<br/>`;
+                input.classList.add('invalid-input'); // Highlight invalid input
+                resultDiv.innerHTML += `Value for ${input.id.replace('_', ' ')} must be between ${min} and ${max}.<br/>`;
             } else {
-                inputElement.classList.remove('invalid-input'); // Remove highlight from valid input
-                data[key] = numValue;
-                // Calculate fill height as a percentage and set the height of the wine fill
-                const fillHeight = ((numValue - min) / (max - min)) * 100;
-                glass.style.height = `${fillHeight}%`;
+                input.classList.remove('invalid-input'); // Remove highlight from valid input
+                data[input.id] = numValue;
             }
         });
 
-        // Stop here if validation failed
         if (!isValid) {
             resultDiv.style.display = 'block';
             return;
         }
 
-        // Display loading message or spinner
+        // Display loading message
         resultDiv.innerHTML = 'Calculating...';
         resultDiv.style.display = 'block';
 
-        // Send valid data to server
         try {
             const response = await fetch('/predict', {
                 method: 'POST',
@@ -59,10 +58,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const result = await response.json();
             resultDiv.innerHTML = `Predicted Quality: ${result.prediction}`;
-            resultDiv.style.display = 'block';
         } catch (error) {
             resultDiv.innerHTML = `Error: ${error.message}`;
+        } finally {
             resultDiv.style.display = 'block';
         }
     };
 });
+
+function updateValueDisplay(feature, value) {
+    document.getElementById(`value-${feature}`).innerText = value;
+}
+
+function updateWineGlass() {
+    // This example assumes a simplistic approach to updating the wine glass fill level.
+    // Implement the logic based on the average value of all sliders or a specific feature's value.
+    const sliders = document.querySelectorAll('input[type="range"]');
+    let totalValue = 0;
+    sliders.forEach(slider => {
+        totalValue += parseFloat(slider.value);
+    });
+    const averageValue = totalValue / sliders.length;
+    // Example: Update SVG fill level based on averageValue. Adjust logic as needed.
+    // This part needs to be tailored to your SVG and the visual effect you desire.
+}

@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <title>Wine Quality Prediction</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .wine-glass svg {
+            height: 200px; /* Adjust as needed */
+            width: auto;
+        }
+    </style>
 </head>
 <body>
     <h2>Enter Wine Characteristics</h2>
@@ -12,10 +18,8 @@
             {% for feature, range in FEATURE_RANGES.items() %}
             <div class="form-group">
                 <label for="{{ feature }}">{{ feature.replace('_', ' ').title() }} ({{ range[0] }} - {{ range[1] }}):</label>
-                <div class="wine-glass">
-                    <div class="wine-fill" style="height: 0%;"></div>
-                </div>
-                <input type="number" id="{{ feature }}" name="{{ feature }}" min="{{ range[0] }}" max="{{ range[1] }}" step="0.01" required>
+                <input type="range" id="{{ feature }}" name="{{ feature }}" min="{{ range[0] }}" max="{{ range[1] }}" step="0.01" value="{{ (range[0] + range[1]) / 2 }}" oninput="updateValueDisplay('{{ feature }}', this.value); updateWineGlass();" required>
+                <span id="value-{{ feature }}" class="slider-value">{{ (range[0] + range[1]) / 2 }}</span>
             </div>
             {% endfor %}
             <div>
@@ -24,6 +28,18 @@
         </form>
     </div>
     <div id="predictionResult"></div>
+    <!-- SVG for the wine glass visual -->
+    <div class="wine-glass">
+        <svg viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg">
+            <!-- Wine glass outline (customize as needed) -->
+            <path d="M25,10 Q50,60 75,10" stroke="black" fill="transparent"/>
+            <line x1="25" y1="10" x2="25" y2="140" stroke="black"/>
+            <line x1="75" y1="10" x2="75" y2="140" stroke="black"/>
+            <line x1="10" y1="140" x2="90" y2="140" stroke="black"/>
+            <!-- Wine fill (initially empty) -->
+            <path d="M25,140 Q50,140 75,140" stroke="none" fill="purple" id="wineFill"/>
+        </svg>
+    </div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
