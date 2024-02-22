@@ -2,44 +2,51 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wine Quality Prediction</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        .wine-glass svg {
-            height: 200px; /* Adjust as needed */
-            width: auto;
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="number"] { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        .prediction { margin-top: 20px; }
     </style>
 </head>
 <body>
-    <h2>Enter Wine Characteristics</h2>
-    <div class="form-container">
-        <form id="wineForm">
-            {% for feature, range in FEATURE_RANGES.items() %}
-            <div class="form-group">
-                <label for="{{ feature }}">{{ feature.replace('_', ' ').title() }} ({{ range[0] }} - {{ range[1] }}):</label>
-                <input type="range" id="{{ feature }}" name="{{ feature }}" min="{{ range[0] }}" max="{{ range[1] }}" step="0.01" value="{{ (range[0] + range[1]) / 2 }}" oninput="updateValueDisplay('{{ feature }}', this.value); updateWineGlass();" required>
-                <span id="value-{{ feature }}" class="slider-value">{{ (range[0] + range[1]) / 2 }}</span>
-            </div>
-            {% endfor %}
-            <div>
-                <button type="submit">Predict Quality</button>
-            </div>
-        </form>
-    </div>
-    <div id="predictionResult"></div>
-    <!-- SVG for the wine glass visual -->
-    <div class="wine-glass">
-        <svg viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg">
-            <!-- Wine glass outline (customize as needed) -->
-            <path d="M25,10 Q50,60 75,10" stroke="black" fill="transparent"/>
-            <line x1="25" y1="10" x2="25" y2="140" stroke="black"/>
-            <line x1="75" y1="10" x2="75" y2="140" stroke="black"/>
-            <line x1="10" y1="140" x2="90" y2="140" stroke="black"/>
-            <!-- Wine fill (initially empty) -->
-            <path d="M25,140 Q50,140 75,140" stroke="none" fill="purple" id="wineFill"/>
-        </svg>
-    </div>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <h1>Wine Quality Prediction</h1>
+    <form id="predictionForm">
+        {% for feature, range in FEATURE_RANGES.items() %}
+        <div class="form-group">
+            <label for="{{ feature }}">{{ feature.replace('_', ' ') | capitalize }} (Range: {{ range[0] }} - {{ range[1] }})</label>
+            <input type="number" id="{{ feature }}" name="{{ feature }}" step="any" required min="{{ range[0] }}" max="{{ range[1] }}">
+        </div>
+        {% endfor %}
+        <button type="submit">Predict</button>
+    </form>
+    <div class="prediction" id="predictionResult"></div>
+
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const formProps = Object.fromEntries(formData);
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formProps),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('predictionResult').innerHTML = 'Predicted Quality: ' + data.prediction;
+            })
+            .catch(error => {
+                document.getElementById('predictionResult').innerHTML = 'Error: ' + error;
+            });
+        });
+    </script>
 </body>
 </html>

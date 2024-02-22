@@ -42,7 +42,7 @@ def predict():
 
         # Make prediction
         prediction = model.predict([feature_values])[0]
-        prediction = np.rint(prediction).item()
+        prediction = (prediction).item()
         return jsonify({'prediction': prediction})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
