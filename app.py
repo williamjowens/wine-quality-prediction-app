@@ -32,21 +32,20 @@ def index():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    # Extract features from form and validate
     try:
-        feature_values = []
-        for feature, (min_val, max_val) in FEATURE_RANGES.items():
-            value = float(request.form[feature])
-            if not (min_val <= value <= max_val):
-                return jsonify({'error': f'Value for {feature} out of range. Should be between {min_val} and {max_val}.'})
-            feature_values.append(value)
+        data = request.get_json()  # Parse JSON data sent from the client
+        feature_values = [data[feature] for feature in FEATURE_RANGES]
+        
+        # Ensure all features are present
+        if len(feature_values) != len(FEATURE_RANGES):
+            raise ValueError("Missing features")
 
         # Make prediction
         prediction = model.predict([feature_values])[0]
-        prediction = np.rint(prediction)
-        return render_template('result.html', prediction=prediction)
+        prediction = np.rint(prediction).item()
+        return jsonify({'prediction': prediction})
     except Exception as e:
-        return jsonify({'error': str(e)})
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
